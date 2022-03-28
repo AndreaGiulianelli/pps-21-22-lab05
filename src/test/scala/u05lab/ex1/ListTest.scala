@@ -25,11 +25,11 @@ class ListTest {
 
   @Test
   def testSpanRecursive(): Unit =
-    assertEquals((10 :: Nil(), 25 :: 30 :: 35 :: Nil()), l.spanRecursive(_ % 2 == 0))
+    assertEquals((10 :: 25 :: Nil(), 30 :: 35 :: Nil()), l.spanRecursive(_ <= 25))
 
   @Test
   def testSpan(): Unit =
-    assertEquals((10 :: Nil(), 25 :: 30 :: 35 :: Nil()), l.span(_ % 2 == 0))
+    assertEquals((10 :: 25 :: Nil(), 30 :: 35 :: Nil()), l.span(_ <= 25))
 
 
 }

@@ -2,6 +2,8 @@ package u05lab.ex1
 
 import u05lab.ex1.List
 
+import scala.::
+
 // Ex 1. implement the missing methods both with recursion or with using fold, map, flatMap, and filters
 // List as a pure interface
 enum List[A]:
@@ -65,25 +67,28 @@ enum List[A]:
       case _ => Nil()
     _zipRight(this, 0)
 
-  def zipRight: List[(A, Int)] = ???
+  def zipRight: List[(A, Int)] =
+    this.foldLeft((Nil[(A, Int)](), 0))((acc, elem) => ((elem, acc._2) :: acc._1, acc._2 + 1))._1.reverse()
 
-  def partitionRecursive(pred: A => Boolean): (List[A], List[A]) =
-    def _partition(l: List[A], pred: A => Boolean, par: (List[A], List[A])): (List[A], List[A]) = l match
-      case h :: t if pred(h) => val next = _partition(t, pred, par); (h :: next._1, next._2)
-      case h :: t => val next = _partition(t, pred, par); (next._1, h :: next._2)
-      case _ => par // In teoria basta metteree nil nil qui e non c'è bisogno di _partition
-    _partition(this, pred, (Nil(), Nil()))
+    //alternative:
+    //this.foldRight((Nil[(A, Int)](), this.length))((elem, acc) => ((elem, acc._2 - 1) :: acc._1, acc._2 - 1))._1
+
+  def partitionRecursive(pred: A => Boolean): (List[A], List[A]) = this match
+      case h :: t if pred(h) => val next = t.partitionRecursive(pred); (h :: next._1, next._2)
+      case h :: t => val next = t.partitionRecursive(pred); (next._1, h :: next._2)
+      case _ => (Nil(), Nil())
 
   def partition(pred: A => Boolean): (List[A], List[A]) =
     this.foldRight((Nil(), Nil()))((elem, res) => if pred(elem) then (elem :: res._1, res._2) else (res._1, elem :: res._2))
 
-  def spanRecursive(pred: A => Boolean): (List[A], List[A]) =
-    def _span(l: List[A], pred: A => Boolean, s: (List[A], List[A])): (List[A], List[A]) = l match
-      case h :: t if pred(h) => _span(t, pred, (h :: s._1, s._2));
-      case _ => (s._1, l)
-    _span(this, pred, (Nil(), Nil()))
+  def spanRecursive(pred: A => Boolean): (List[A], List[A]) = this match
+    case h :: t if pred(h) => val next = t.spanRecursive(pred); (h :: next._1, next._2)
+    case h :: t => val next = t.spanRecursive(pred); (next._1, h :: next._2)
+    case _ => (Nil(), Nil())
 
-  def span(pred: A => Boolean): (List[A], List[A]) = ???
+  def span(pred: A => Boolean): (List[A], List[A]) =
+
+
 
 
   /** @throws UnsupportedOperationException if the list is empty */
