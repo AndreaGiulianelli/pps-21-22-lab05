@@ -81,25 +81,33 @@ enum List[A]:
   def partition(pred: A => Boolean): (List[A], List[A]) =
     this.foldRight((Nil(), Nil()))((elem, res) => if pred(elem) then (elem :: res._1, res._2) else (res._1, elem :: res._2))
 
-  def spanRecursive(pred: A => Boolean): (List[A], List[A]) = this match
-    case h :: t if pred(h) => val next = t.spanRecursive(pred); (h :: next._1, next._2)
-    case h :: t => val next = t.spanRecursive(pred); (next._1, h :: next._2)
-    case _ => (Nil(), Nil())
+  def spanRecursive(pred: A => Boolean): (List[A], List[A]) =
+    def _span(l: List[A], pred: A => Boolean, s: (List[A], List[A])): (List[A], List[A]) = l match
+      case h :: t if pred(h) => val next = _span(t, pred, s); (h :: next._1, next._2)
+      case _ => (s._1, l)
+    _span(this, pred, (Nil(), Nil()))
 
-  def span(pred: A => Boolean): (List[A], List[A]) =
-
-
-
+  def span(pred: A => Boolean): (List[A], List[A]) = ???
+    //this.foldLeft(((Nil[A](), Nil[A]()), true))((acc, elem) =>
+    //        if acc._2 && pred(elem)
+    //          then ((acc._1._1 append elem :: Nil(), Nil()), true)
+    //          else ((acc._1._1, acc._1._2 append elem :: Nil()), false))._1
 
   /** @throws UnsupportedOperationException if the list is empty */
   def reduceRecursive(op: (A, A) => A): A = ???
 
   /** @throws UnsupportedOperationException if the list is empty */
-  def reduce(op: (A, A) => A): A = ???
+  def reduce(op: (A, A) => A): A = this match
+    case h :: t => t.foldLeft(h)(op)
+    case _ => throw UnsupportedOperationException()
 
   def takeRightRecursive(n: Int): List[A] = ???
 
-  def takeRight(n: Int): List[A] = ???
+  def takeRight(n: Int): List[A] =
+    this.foldRight((Nil[A](), n))((elem, acc) => if acc._2 > 0 then (elem :: acc._1, acc._2 - 1) else acc)._1
+
+  // In teoria ho sulle slide come si utilizza
+  def collect[B](f: PartialFunction[A, B]): B = ???
 
 // Factories
 object List:
