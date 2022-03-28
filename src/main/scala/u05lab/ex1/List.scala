@@ -59,14 +59,40 @@ enum List[A]:
   def reverse(): List[A] = foldLeft[List[A]](Nil())((l, e) => e :: l)
 
   /** EXERCISES */
+  def zipRightRecursive: List[(A, Int)] =
+    def _zipRight(l: List[A], n: Int): List[(A, Int)] = l match
+      case h :: t => (h, n) :: _zipRight(t, n + 1)
+      case _ => Nil()
+    _zipRight(this, 0)
+
   def zipRight: List[(A, Int)] = ???
 
-  def partition(pred: A => Boolean): (List[A], List[A]) = ???
+  def partitionRecursive(pred: A => Boolean): (List[A], List[A]) =
+    def _partition(l: List[A], pred: A => Boolean, par: (List[A], List[A])): (List[A], List[A]) = l match
+      case h :: t if pred(h) => val next = _partition(t, pred, par); (h :: next._1, next._2)
+      case h :: t => val next = _partition(t, pred, par); (next._1, h :: next._2)
+      case _ => par // In teoria basta metteree nil nil qui e non c'è bisogno di _partition
+    _partition(this, pred, (Nil(), Nil()))
+
+  def partition(pred: A => Boolean): (List[A], List[A]) =
+    this.foldRight((Nil(), Nil()))((elem, res) => if pred(elem) then (elem :: res._1, res._2) else (res._1, elem :: res._2))
+
+  def spanRecursive(pred: A => Boolean): (List[A], List[A]) =
+    def _span(l: List[A], pred: A => Boolean, s: (List[A], List[A])): (List[A], List[A]) = l match
+      case h :: t if pred(h) => _span(t, pred, (h :: s._1, s._2));
+      case _ => (s._1, l)
+    _span(this, pred, (Nil(), Nil()))
 
   def span(pred: A => Boolean): (List[A], List[A]) = ???
 
+
+  /** @throws UnsupportedOperationException if the list is empty */
+  def reduceRecursive(op: (A, A) => A): A = ???
+
   /** @throws UnsupportedOperationException if the list is empty */
   def reduce(op: (A, A) => A): A = ???
+
+  def takeRightRecursive(n: Int): List[A] = ???
 
   def takeRight(n: Int): List[A] = ???
 
