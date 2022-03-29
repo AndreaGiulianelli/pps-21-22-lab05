@@ -40,10 +40,15 @@ class ListTest {
     assertEquals(80, l.reduce(_ + _))
 
   @Test
-  def takeRightRecursive(): Unit =
+  def testTakeRightRecursive(): Unit =
     assertEquals(25 :: 30 :: 15 :: Nil(), l.takeRightRecursive(3))
 
   @Test
-  def takeRight(): Unit =
+  def testTakeRight(): Unit =
     assertEquals(25 :: 30 :: 15 :: Nil(), l.takeRight(3))
+
+  @Test
+  def testCollect(): Unit =
+    assertEquals(26 :: 31 :: Nil(), l.collect({case i if i > 15 => i + 1}))
+
 }

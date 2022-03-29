@@ -69,7 +69,6 @@ enum List[A]:
 
   def zipRight: List[(A, Int)] =
     this.foldLeft((Nil[(A, Int)](), 0))((acc, elem) => ((elem, acc._2) :: acc._1, acc._2 + 1))._1.reverse()
-
     //alternative:
     //this.foldRight((Nil[(A, Int)](), this.length))((elem, acc) => ((elem, acc._2 - 1) :: acc._1, acc._2 - 1))._1
 
@@ -87,27 +86,39 @@ enum List[A]:
       case _ => (s._1, l)
     _span(this, pred, (Nil(), Nil()))
 
-  def span(pred: A => Boolean): (List[A], List[A]) = ???
-    //this.foldLeft(((Nil[A](), Nil[A]()), true))((acc, elem) =>
-    //        if acc._2 && pred(elem)
-    //          then ((acc._1._1 append elem :: Nil(), Nil()), true)
-    //          else ((acc._1._1, acc._1._2 append elem :: Nil()), false))._1
+  def span(pred: A => Boolean): (List[A], List[A]) =
+    this.foldLeft(((Nil[A](), Nil[A]()), true))((acc, elem) =>
+            if acc._2 && pred(elem)
+              then ((acc._1._1 append elem :: Nil(), Nil()), true)
+              else ((acc._1._1, acc._1._2 append elem :: Nil()), false))._1
 
   /** @throws UnsupportedOperationException if the list is empty */
-  def reduceRecursive(op: (A, A) => A): A = ???
+  def reduceRecursive(op: (A, A) => A): A =
+    @annotation.tailrec
+    def _reduce(l: List[A], op: (A, A) => A, acc: A): A = l match
+      case h :: t => _reduce(t, op, op(h, acc))
+      case _ => acc
+
+    this match
+      case h :: t => _reduce(t, op, h)
+      case _ => throw UnsupportedOperationException()
 
   /** @throws UnsupportedOperationException if the list is empty */
   def reduce(op: (A, A) => A): A = this match
     case h :: t => t.foldLeft(h)(op)
     case _ => throw UnsupportedOperationException()
 
-  def takeRightRecursive(n: Int): List[A] = ???
+  def take(n: Int): List[A] = this match
+    case h :: t if n > 0 => h :: t.take(n - 1)
+    case _ => Nil()
+
+  def takeRightRecursive(n: Int): List[A] = this.reverse().take(n).reverse()
 
   def takeRight(n: Int): List[A] =
     this.foldRight((Nil[A](), n))((elem, acc) => if acc._2 > 0 then (elem :: acc._1, acc._2 - 1) else acc)._1
 
-  // In teoria ho sulle slide come si utilizza
-  def collect[B](f: PartialFunction[A, B]): B = ???
+  def collect[B](f: PartialFunction[A, B]): List[B] =
+    this.filter(f.isDefinedAt(_)).map(f)
 
 // Factories
 object List:
