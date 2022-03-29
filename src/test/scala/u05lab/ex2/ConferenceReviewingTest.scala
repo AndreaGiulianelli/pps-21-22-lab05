@@ -7,7 +7,7 @@ import u05lab.ex2.ConferenceRev.*
 
 class ConferenceReviewingTest:
 
-  val cr = ConferenceReviewingImpl()
+  val cr = ConferenceReviewing()
   cr.loadReview(1, 8, 8, 6, 8); // 4.8 è il voto finale pesato (usato da averageWeightedFinalScoreMap)
   // e simile per gli altri
   cr.loadReview(1, 9, 9, 6, 9); // 5.4
@@ -29,3 +29,15 @@ class ConferenceReviewingTest:
   @Test
   def testAverageFinalScore(): Unit =
     assertEquals(8.5, cr.averageFinalScores(1), 0.01)
+
+  @Test
+  def testAcceptedArticles(): Unit =
+    assertEquals(Set(1, 2, 4), cr.acceptedArticles())
+
+  @Test
+  def testSortedAcceptedArticles(): Unit =
+    assertEquals(List((4, 7.0), (2, 7.5), (1, 8.5)), cr.sortedAcceptedArticles())
+
+  @Test
+  def testOptionalTestAverageWeightedFinalScore(): Unit =
+    assertEquals((4.8 + 5.4) / 2, cr.averageWeightedFinalScoreMap().get(1).get, 0.01)

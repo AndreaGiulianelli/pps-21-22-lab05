@@ -14,30 +14,51 @@ object ConferenceRev:
     def sortedAcceptedArticles(): List[(Int, Double)]
     def averageWeightedFinalScoreMap(): Map[Int, Double]
 
-  class ConferenceReviewingImpl extends ConferenceReviewing:
-    import ConferenceRev.Question.*
+  object ConferenceReviewing:
+    def apply(): ConferenceReviewing = ConferenceReviewingImpl()
+    private class ConferenceReviewingImpl extends ConferenceReviewing:
+      import ConferenceRev.Question.*
 
-    var revs: List[(Int, Map[Question, Int])] = List()
+      var revs: List[(Int, Map[Question, Int])] = List()
 
-    def loadReview(art: Int, scores: Map[Question, Int]): Unit =
-      revs = (art, scores) :: revs
+      override def loadReview(art: Int, scores: Map[Question, Int]): Unit =
+        revs = (art, scores) :: revs
 
-    def loadReview(art: Int, rel: Int, sign: Int, conf: Int, fin: Int): Unit =
-      revs = (art, Map(Relevance -> rel, Significance -> sign, Confidence -> conf, Final -> fin)) :: revs
+      override def loadReview(art: Int, rel: Int, sign: Int, conf: Int, fin: Int): Unit =
+        revs = (art, Map(Relevance -> rel, Significance -> sign, Confidence -> conf, Final -> fin)) :: revs
 
-    def orderedScores(art: Int, quest: Question): List[Int] =
-      revs.filter(_._1 == art)
-        .map(_._2.get(quest).get)
-        .sorted
+      override def orderedScores(art: Int, quest: Question): List[Int] =
+        revs.collect({case (a, m) if a == art => m.get(quest).get})
+            .sorted
 
-    def averageFinalScores(art: Int): Double =
-      // instead of map + sum / lenght I found this method on the Internet
-      revs.filter(_._1 == art)
-        .foldLeft((0.0, 1))((acc, elem) => (acc._1 + (elem._2.get(Final).get - acc._1) / acc._2, acc._2 + 1))._1
+      override def averageFinalScores(art: Int): Double =
+        avg(revs.filter(_._1 == art), _._2.get(Final).get)
 
-    def acceptedArticles(): Set[Int] = ???
+      private def accepted(art: Int): Boolean =
+        averageFinalScores(art) > 5.0 &&
+          revs.collect({case (a, m) if a == art => m.get(Relevance).get})
+            .exists(_ >= 8)
 
-    def sortedAcceptedArticles(): List[(Int, Double)] = ???
+      override def acceptedArticles(): Set[Int] =
+        revs.map(_._1)
+          .distinct
+          .filter(accepted(_))
+          .toSet
 
-    def averageWeightedFinalScoreMap(): Map[Int, Double] = ???
+      override def sortedAcceptedArticles(): List[(Int, Double)] =
+        acceptedArticles().toList
+          .map(art => (art, averageFinalScores(art)))
+          .sortBy((a, v) => v)
+
+      private def averageWeightedFinalScore(art: Int): Double =
+        avg(revs.collect({case (a, m) if a == art => m.get(Final).get * m.get(Confidence).get / 10.0}), v => v)
+
+      override def averageWeightedFinalScoreMap(): Map[Int, Double] =
+        revs.map(a => (a._1, averageWeightedFinalScore(a._1)))
+          .toMap
+
+      // instead of map + sum / length I found this method to calculate the avg
+      private def avg[A](l: List[A], extractor: A => Double): Double =
+        l.foldLeft((0.0, 1))((acc, elem) => (acc._1 + (extractor(elem) - acc._1) / acc._2, acc._2 + 1))._1
+
 
