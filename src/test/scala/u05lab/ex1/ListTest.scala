@@ -1,10 +1,10 @@
 package u05lab.ex1
 
-import org.junit.Assert.assertEquals
+import org.junit.Assert.{assertEquals, assertThrows}
 import org.junit.Test
 import u05lab.ex1.List.*
 
-class ListTest {
+class ListTest:
   private val l = 10 :: 25 :: 30 :: 15 :: Nil()
 
   @Test
@@ -40,6 +40,10 @@ class ListTest {
     assertEquals(80, l.reduce(_ + _))
 
   @Test
+  def testReduceExc(): Unit =
+    assertThrows(classOf[UnsupportedOperationException], () => Nil().reduce((a, b) => a))
+
+  @Test
   def testTakeRightRecursive(): Unit =
     assertEquals(25 :: 30 :: 15 :: Nil(), l.takeRightRecursive(3))
 
@@ -50,5 +54,3 @@ class ListTest {
   @Test
   def testCollect(): Unit =
     assertEquals(26 :: 31 :: Nil(), l.collect({case i if i > 15 => i + 1}))
-
-}
