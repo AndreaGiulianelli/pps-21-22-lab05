@@ -130,7 +130,7 @@ object List:
 
   def of[A](elem: A, n: Int): List[A] =
     if n == 0 then Nil() else elem :: of(elem, n - 1)
-
+ 
 @main def checkBehaviour(): Unit =
   val reference = List(1, 2, 3, 4)
   println(reference.zipRight) // List((1, 0), (2, 1), (3, 2), (4, 3))
