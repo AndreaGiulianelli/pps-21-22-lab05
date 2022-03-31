@@ -28,6 +28,10 @@ class ListTest:
     assertEquals((10 :: 25 :: Nil(), 30 :: 15 :: Nil()), l.spanRecursive(_ <= 25))
 
   @Test
+  def testSpanRecursiveZeroElements(): Unit =
+    assertEquals((Nil(), 10 :: 25 :: 30 :: 15 :: Nil()), l.spanRecursive(_ < 0))
+
+  @Test
   def testSpan(): Unit =
     assertEquals((10 :: 25 :: Nil(), 30 :: 15 :: Nil()), l.span(_ <= 25))
 

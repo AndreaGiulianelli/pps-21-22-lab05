@@ -69,8 +69,9 @@ enum List[A]:
 
   def zipRight: List[(A, Int)] =
     this.foldLeft((Nil[(A, Int)](), 0))((acc, elem) => ((elem, acc._2) :: acc._1, acc._2 + 1))._1.reverse()
-    //alternative:
-    //this.foldRight((Nil[(A, Int)](), this.length))((elem, acc) => ((elem, acc._2 - 1) :: acc._1, acc._2 - 1))._1
+
+  def zipRight1: List[(A, Int)] =
+    this.foldRight((Nil[(A, Int)](), this.length))((elem, acc) => ((elem, acc._2 - 1) :: acc._1, acc._2 - 1))._1
 
   def partitionRecursive(pred: A => Boolean): (List[A], List[A]) = this match
       case h :: t if pred(h) => val next = t.partitionRecursive(pred); (h :: next._1, next._2)
@@ -80,13 +81,14 @@ enum List[A]:
   def partition(pred: A => Boolean): (List[A], List[A]) =
     this.foldRight((Nil(), Nil()))((elem, res) => if pred(elem) then (elem :: res._1, res._2) else (res._1, elem :: res._2))
 
-  def spanRecursive(pred: A => Boolean): (List[A], List[A]) =
-    def _span(l: List[A], pred: A => Boolean, s: (List[A], List[A])): (List[A], List[A]) = l match
-      case h :: t if pred(h) => val next = _span(t, pred, s); (h :: next._1, next._2)
-      case _ => (s._1, l)
-    _span(this, pred, (Nil(), Nil()))
+  def spanRecursive(pred: A => Boolean): (List[A], List[A]) = this match
+    case h :: t if pred(h) => val next = t.spanRecursive(pred); (h :: next._1, next._2)
+    case _ => (Nil(), this)
 
   def span(pred: A => Boolean): (List[A], List[A]) =
+    this.foldRight((Nil[A](), Nil[A]()))((elem, acc) => if pred(elem) then (elem :: acc._1, acc._2) else (Nil(), elem :: acc._2 append acc._1))
+
+  def span1(pred: A => Boolean): (List[A], List[A]) =
     this.foldLeft(((Nil[A](), Nil[A]()), true))((acc, elem) =>
             if acc._2 && pred(elem)
               then ((acc._1._1 append elem :: Nil(), Nil()), true)
@@ -108,7 +110,7 @@ enum List[A]:
     case h :: t => t.foldLeft(h)(op)
     case _ => throw UnsupportedOperationException()
 
-  def take(n: Int): List[A] = this match
+  private def take(n: Int): List[A] = this match
     case h :: t if n > 0 => h :: t.take(n - 1)
     case _ => Nil()
 
