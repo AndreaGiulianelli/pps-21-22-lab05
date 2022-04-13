@@ -9,7 +9,7 @@ object ConferenceRev:
     def loadReview(art: Int, scores: Map[Question, Int]): Unit
     def loadReview(art: Int, rel: Int, sign: Int, conf: Int, fin: Int): Unit
     def orderedScores(art: Int, quest: Question): List[Int]
-    def averageFinalScores(art: Int): Double
+    def averageFinalScore(art: Int): Double
     def acceptedArticles(): Set[Int]
     def sortedAcceptedArticles(): List[(Int, Double)]
     def averageWeightedFinalScoreMap(): Map[Int, Double]
@@ -31,30 +31,32 @@ object ConferenceRev:
         revs.collect({case (a, m) if a == art => m.get(quest).get})
             .sorted
 
-      override def averageFinalScores(art: Int): Double =
+      override def averageFinalScore(art: Int): Double =
         avg(revs.filter(_._1 == art), _._2.get(Final).get)
 
-      private def accepted(art: Int): Boolean =
-        averageFinalScores(art) > 5.0 &&
-          revs.collect({case (a, m) if a == art => m.get(Relevance).get})
-            .exists(_ >= 8)
-
       override def acceptedArticles(): Set[Int] =
+        // Method nested because used only here
+        def _accepted(art: Int): Boolean =
+          averageFinalScore(art) > 5.0 &&
+            revs.collect({case (a, m) if a == art => m.get(Relevance).get})
+              .exists(_ >= 8)
+
         revs.map(_._1)
           .distinct
-          .filter(accepted(_))
+          .filter(_accepted(_))
           .toSet
 
       override def sortedAcceptedArticles(): List[(Int, Double)] =
         acceptedArticles().toList
-          .map(art => (art, averageFinalScores(art)))
+          .map(art => (art, averageFinalScore(art)))
           .sortBy((a, v) => v)
 
-      private def averageWeightedFinalScore(art: Int): Double =
-        avg(revs.collect({case (a, m) if a == art => m.get(Final).get * m.get(Confidence).get / 10.0}), v => v)
-
       override def averageWeightedFinalScoreMap(): Map[Int, Double] =
-        revs.map(a => (a._1, averageWeightedFinalScore(a._1)))
+        // Method nested because used only here
+        def _averageWeightedFinalScore(art: Int): Double =
+          avg(revs.collect({case (a, m) if a == art => m.get(Final).get * m.get(Confidence).get / 10.0}), v => v)
+
+        revs.map(_._1).distinct.map(a => (a, _averageWeightedFinalScore(a)))
           .toMap
 
       // instead of map + sum / length I found this method to calculate the avg

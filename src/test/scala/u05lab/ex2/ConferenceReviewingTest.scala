@@ -28,7 +28,7 @@ class ConferenceReviewingTest:
 
   @Test
   def testAverageFinalScore(): Unit =
-    assertEquals(8.5, cr.averageFinalScores(1), 0.01)
+    assertEquals(8.5, cr.averageFinalScore(1), 0.01)
 
   @Test
   def testAcceptedArticles(): Unit =
