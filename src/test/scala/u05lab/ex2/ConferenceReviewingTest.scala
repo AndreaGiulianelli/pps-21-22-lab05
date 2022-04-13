@@ -6,7 +6,6 @@ import org.junit.Before
 import u05lab.ex2.ConferenceRev.*
 
 class ConferenceReviewingTest:
-
   val cr = ConferenceReviewing()
   cr.loadReview(1, 8, 8, 6, 8); // 4.8 è il voto finale pesato (usato da averageWeightedFinalScoreMap)
   // e simile per gli altri
@@ -20,7 +19,6 @@ class ConferenceReviewingTest:
   cr.loadReview(4,Map(Question.Relevance -> 8, Question.Significance -> 8, Question.Confidence -> 7, Question.Final -> 8));
   cr.loadReview(5, 6, 6, 6, 10); // 6.0
   cr.loadReview(5, 7, 7, 7, 10); // 7.0
-
 
   @Test
   def testOrderedScores(): Unit =

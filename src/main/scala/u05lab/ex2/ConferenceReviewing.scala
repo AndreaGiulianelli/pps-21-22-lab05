@@ -1,7 +1,6 @@
 package u05lab.ex2
 
 object ConferenceRev:
-
   enum Question:
     case Relevance, Significance, Confidence, Final
 
@@ -62,5 +61,3 @@ object ConferenceRev:
       // instead of map + sum / length I found this method to calculate the avg
       private def avg[A](l: List[A], extractor: A => Double): Double =
         l.foldLeft((0.0, 1))((acc, elem) => (acc._1 + (extractor(elem) - acc._1) / acc._2, acc._2 + 1))._1
-
-
