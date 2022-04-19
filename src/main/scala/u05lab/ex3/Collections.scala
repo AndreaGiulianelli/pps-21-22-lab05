@@ -29,7 +29,6 @@ private object PerformanceBenchmarks:
     measure("add head: ")(0 :: l)
     measure("take first 2: ")(l take 2)
 
-
   def benchLinearMSeq() =
     import scala.collection.mutable.ListBuffer
     println("< ListBuffer (mutable) >")
