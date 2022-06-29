@@ -78,6 +78,13 @@ enum List[A]:
       case h :: t => val next = t.partitionRecursive(pred); (next._1, h :: next._2)
       case _ => (Nil(), Nil())
 
+  def partitionRecursive1(pred: A => Boolean): (List[A], List[A]) =
+    def _partitionR(pred: A => Boolean, l: List[A], ok: List[A], nok: List[A]): (List[A], List[A]) = l match
+      case h :: t if pred(h) => _partitionR(pred, t, h :: ok, nok)
+      case h :: t => _partitionR(pred, t, ok, h :: nok)
+      case _ => (ok.reverse(), nok.reverse())
+    _partitionR(pred, this, Nil(), Nil())
+
   def partition(pred: A => Boolean): (List[A], List[A]) =
     this.foldRight((Nil(), Nil()))((elem, res) => if pred(elem) then (elem :: res._1, res._2) else (res._1, elem :: res._2))
 

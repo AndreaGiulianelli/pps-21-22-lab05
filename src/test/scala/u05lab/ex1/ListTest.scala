@@ -20,6 +20,10 @@ class ListTest:
     assertEquals((10 :: 30 :: Nil(), 25 :: 15 :: Nil()), l.partitionRecursive(_ % 2 == 0))
 
   @Test
+  def testPartitionRecursive1(): Unit =
+    assertEquals((10 :: 30 :: Nil(), 25 :: 15 :: Nil()), l.partitionRecursive1(_ % 2 == 0))
+
+  @Test
   def testPartition(): Unit =
     assertEquals((10 :: 30 :: Nil(), 25 :: 15 :: Nil()), l.partition(_ % 2 == 0))
 
